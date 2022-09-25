@@ -48,7 +48,7 @@ void usart3_default_init(void)
 	// Configure USART parameters (TE, RE, PS, PCE, M, STOP)
 	USART3->CR1 |= (1U << USART_CR1_TE_POS) | (1U << USART_CR1_RE_POS);
 	// Set baud rate
-	USART3->BRR = (PERIPH_CLK + (115200 / 2U)) / 115200;
+	USART3->BRR = (PERIPH_CLK + (230400 / 2U)) / 230400;
 	// enable USART3
 	USART3->CR1 |= 1U << USART_CR1_UE_POS;
 }

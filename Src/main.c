@@ -19,13 +19,14 @@ bool flag_get = false;
 
 int main(void)
 {
+	fpu_enable();
 	float get[7] = {0};
 	float err[6] = {0};
 	float state[3][2] = {0};
 	float angle[3] = {0};
-	uint8_t rate = 100;
-
-	fpu_enable();
+	uint8_t rate = 250;
+	float dt = 1.0 / (float)rate;
+	
 	usart3_default_init();
 	i2c1_master_default_init();
 	tim1_interrupt_init(rate);
@@ -45,7 +46,7 @@ int main(void)
 		if (flag_get) {
 			mpu6050_get_all(get);
 			mpu6050_static_attitude(get, angle);
-			mpu6050_kalman(state, angle, &get[4], 1.0 / (float)rate);
+			mpu6050_kalman(state, angle, &get[4], dt);
 
 			for (int i = 0; i < 3; i++) {
 				printf("%.3f,", get[i]);
