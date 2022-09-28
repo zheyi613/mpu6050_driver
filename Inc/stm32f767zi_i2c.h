@@ -67,6 +67,7 @@
 
 #define I2C_SLAVE_OWN_ADDRESS   0x2D
 #define I2C_TIMING              0x00303D5B      // Generate by CubeMX32 with 16MHz
+#define I2C_FAST_TIMING         0x2010091A      // Generate by CubeMx32 with 16MHz
 
 void i2c2_slave_default_init(void);
 void i2c1_master_default_init(void);

@@ -35,7 +35,7 @@ void i2c1_master_default_init(void)
 	// Disable I2C module
 	I2C1->CR1 &= ~I2C_CR1_PE;
 	// Set timing
-	I2C1->TIMINGR |= I2C_TIMING;
+	I2C1->TIMINGR |= I2C_FAST_TIMING;
 	// Enable I2C module
 	I2C1->CR1 |= I2C_CR1_PE;
 }
