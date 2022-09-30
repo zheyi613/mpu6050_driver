@@ -37,9 +37,9 @@ void usart3_default_init(void)
 	// Enable clock access to GPIOD.
 	RCC->AHB1ENR |= GPIOD_CLK_EN;
 	// Set PD8 (Tx) mode to alternate function.
-	GPIOD->MODER |= GPIO_MODE_ALTFN << 2 * USART3_TX_POS;
+	GPIOD->MODER |= GPIO_MODE_ALTFN << (USART3_TX_POS << 1);
 	// Set PD9 (Rx) mode to alternate function.
-	GPIOD->MODER |= GPIO_MODE_ALTFN << 2 * USART3_RX_POS;
+	GPIOD->MODER |= GPIO_MODE_ALTFN << (USART3_RX_POS << 1);
 	// Set alternate function to USART. GPIO_AFRH = AF7(0b0111) | AF7 << 4
 	GPIOD->AFR[1] |= (USART3_AF << 4) | USART3_AF;
 	systick_delay_ms(10);
@@ -48,7 +48,7 @@ void usart3_default_init(void)
 	// Configure USART parameters (TE, RE, PS, PCE, M, STOP)
 	USART3->CR1 |= (1U << USART_CR1_TE_POS) | (1U << USART_CR1_RE_POS);
 	// Set baud rate
-	USART3->BRR = (PERIPH_CLK + (460800 / 2U)) / 460800;
+	USART3->BRR = (PERIPH_CLK + (921600 / 2U)) / 921600;
 	// enable USART3
 	USART3->CR1 |= 1U << USART_CR1_UE_POS;
 }
@@ -58,9 +58,9 @@ void usart3_interrupt_default_init(void)
 	// Enable clock access to GPIOD.
 	RCC->AHB1ENR |= GPIOD_CLK_EN;
 	// Set PD8 (Tx) mode to alternate function.
-	GPIOD->MODER |= GPIO_MODE_ALTFN << 2 * USART3_TX_POS;
+	GPIOD->MODER |= GPIO_MODE_ALTFN << (USART3_TX_POS << 1);
 	// Set PD9 (Rx) mode to alternate function.
-	GPIOD->MODER |= GPIO_MODE_ALTFN << 2 * USART3_RX_POS;
+	GPIOD->MODER |= GPIO_MODE_ALTFN << (USART3_RX_POS << 1);
 	// Set alternate function to USART. GPIO_AFRH = AF7(0b0111) | AF7 << 4
 	GPIOD->AFR[1] |= (USART3_AF << 4) | USART3_AF;
 	// Enable clock to USART3 module

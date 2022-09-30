@@ -34,6 +34,7 @@
 
 #define APB1_BASE               PERIPH_BASE
 
+#define SPI3_BASE               (APB1_BASE + 0x3C00UL)          // SPI 3
 #define USART2_BASE             (APB1_BASE + 0x4400UL)          // USART 2
 #define USART3_BASE             (APB1_BASE + 0x4800UL)          // USART 3
 #define I2C1_BASE               (APB1_BASE + 0x5400UL)          // I2C 1
@@ -43,6 +44,7 @@
 
 #define TIM1_BASE               (APB2_BASE)                     // Timer 1
 #define ADC1_BASE               (APB2_BASE + 0x2000UL)          // Analog to Digital converter
+#define SPI1_BASE               (APB2_BASE + 0x3000UL)          // Serial peripheral interface
 #define SYSCFG_BASE             (APB2_BASE + 0x3800UL)          // System configuration controller
 #define EXTI_BASE               (APB2_BASE + 0x3C00UL)          // Extended interrupts and events controller
 
@@ -51,7 +53,7 @@
 #define SYST_BASE               (SCS_BASE + 0x0010UL)           // SysTick
 #define NVIC_BASE               (SCS_BASE + 0x0100UL)           // Nested vectored interrupt controller
 
-#define GPIOA_CLE_EN            1U              // Enable GPIOA clock at RCC AHB1EN PIN0
+#define GPIOA_CLK_EN            1U              // Enable GPIOA clock at RCC AHB1EN PIN0
 #define GPIOB_CLK_EN            (1U << 1)       // Enable GPIOB clock at RCC AHB1EN PIN1
 #define GPIOC_CLK_EN            (1U << 2)       // Enable GPIOC clock at RCC AHB1EN PIN2
 #define GPIOD_CLK_EN            (1U << 3)       // Enable GPIOD clock at RCC AHB1EN PIN3
@@ -63,9 +65,12 @@
 #define USART3_CLK_EN           (1U << 18)      // Enable USART3 clock at RCC APB1EN PIN18
 
 #define TIM1_CLK_EN             1U              // Enable timer 1 clock
+
 #define ADC1_CLK_EN             (1U << 8)       // Enable PA4 ADC clock at RCC APB2EN PIN8
 #define I2C1_CLK_EN             (1U << 21)      // Enable I2C 1 clock
 #define I2C2_CLK_EN             (1U << 22)      // Enable I2C 2 clock
+#define SPI1_CLK_EN             (1U << 12)      // Enable SPI 1 clock
+#define SPI3_CLK_EN             (1U << 15)      // Enable SPI 3 clock
 
 #define SYSCFG_CLK_EN           (1U << 14)      // Enable system configuration controller clock
 
@@ -159,8 +164,17 @@ typedef struct {
         __IO uint32_t TXDR;             // Transmit data register                               Address offset: 0x28
 } I2C_reg_t;
 
-typedef struct
-{
+typedef struct {
+        __IO uint32_t CR1;              // Control register 1
+        __IO uint32_t CR2;              // Control register 2
+        __IO uint32_t SR;               // Status register
+        __IO uint32_t DR;               // Data register
+        __IO uint32_t CRCPR;            // CRX polynomial register
+        __IO uint32_t RXCRCR;           // Rx CRC register
+        __IO uint32_t TXCRCR;           // Tx CRC register
+} SPI_reg_t;
+
+typedef struct {
         __IOM uint32_t ISER[8U];        /*!< Offset: 0x000 (R/W)  Interrupt Set Enable Register */
         uint32_t RESERVED0[24U];
         __IOM uint32_t ICER[8U];        /*!< Offset: 0x080 (R/W)  Interrupt Clear Enable Register */
@@ -199,6 +213,8 @@ typedef struct {
 #define EXTI            ((EXTI_reg_t *)EXTI_BASE)
 #define I2C1            ((I2C_reg_t *)I2C1_BASE)
 #define I2C2            ((I2C_reg_t *)I2C2_BASE)
+#define SPI1            ((SPI_reg_t *)SPI1_BASE)
+#define SPI3            ((SPI_reg_t *)SPI3_BASE)
 
 #define NVIC            ((NVIC_reg_t *)NVIC_BASE)
 #define SYST            ((SYST_reg_t *)SYST_BASE)

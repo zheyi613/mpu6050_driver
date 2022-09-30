@@ -16,17 +16,17 @@ void i2c1_master_default_init(void)
 	// Enable clock for GPIOB
 	RCC->AHB1ENR |= GPIOB_CLK_EN;
 	// Configure PB6(SCL) and PB9(SDA) mode to alternative function
-	GPIOB->MODER |= GPIO_MODE_ALTFN << (2 * I2C1_SCL_POS);
-	GPIOB->MODER |= GPIO_MODE_ALTFN << (2 * I2C1_SDA_POS);
+	GPIOB->MODER |= GPIO_MODE_ALTFN << (I2C1_SCL_POS << 1);
+	GPIOB->MODER |= GPIO_MODE_ALTFN << (I2C1_SDA_POS << 1);
 	// Select alternate function type as AF4 (I2C1_SCL/I2C1_SDA)
-	GPIOB->AFR[I2C1_SCL_POS >> 3] |= I2C_AF << (4 * (I2C1_SCL_POS & 0x7U));
-	GPIOB->AFR[I2C1_SDA_POS >> 3] |= I2C_AF << (4 * (I2C1_SDA_POS & 0x7U));
+	GPIOB->AFR[I2C1_SCL_POS >> 3] |= I2C_AF << ((I2C1_SCL_POS & 0x7U) << 2);
+	GPIOB->AFR[I2C1_SDA_POS >> 3] |= I2C_AF << ((I2C1_SDA_POS & 0x7U) << 2);
 	// Set pin output type to open-drain
 	GPIOB->OTYPER |= GPIO_OTYPER_OPEN_DRAIN << I2C1_SCL_POS;
 	GPIOB->OTYPER |= GPIO_OTYPER_OPEN_DRAIN << I2C1_SDA_POS;
 	// Enable internal pull-up register
-	GPIOB->PUPDR |= GPIO_PUPDR_PULL_UP << (2 * I2C1_SCL_POS);
-	GPIOB->PUPDR |= GPIO_PUPDR_PULL_UP << (2 * I2C1_SDA_POS);
+	GPIOB->PUPDR |= GPIO_PUPDR_PULL_UP << (I2C1_SCL_POS << 1);
+	GPIOB->PUPDR |= GPIO_PUPDR_PULL_UP << (I2C1_SDA_POS << 1);
 
 	/*        Configure I2C parameters        */
 
@@ -47,17 +47,17 @@ void i2c2_slave_default_init(void)
 	// Enable clock for GPIOB
 	RCC->AHB1ENR |= GPIOB_CLK_EN;
 	// Configure PB10(SCL) and PB11(SDA) mode to alternative function
-	GPIOB->MODER |= GPIO_MODE_ALTFN << (2 * I2C2_SCL_POS);
-	GPIOB->MODER |= GPIO_MODE_ALTFN << (2 * I2C2_SDA_POS);
+	GPIOB->MODER |= GPIO_MODE_ALTFN << (I2C2_SCL_POS << 1);
+	GPIOB->MODER |= GPIO_MODE_ALTFN << (I2C2_SDA_POS << 1);
 	// Select alternate function type as AF4 (I2C2_SCL/I2C_SDA)
-	GPIOB->AFR[I2C2_SCL_POS >> 3] |= I2C_AF << (4 * (I2C2_SCL_POS & 0x7U));
-	GPIOB->AFR[I2C2_SDA_POS >> 3] |= I2C_AF << (4 * (I2C2_SDA_POS & 0x7U));
+	GPIOB->AFR[I2C2_SCL_POS >> 3] |= I2C_AF << ((I2C2_SCL_POS & 0x7U) << 2);
+	GPIOB->AFR[I2C2_SDA_POS >> 3] |= I2C_AF << ((I2C2_SDA_POS & 0x7U) << 2);
 	// Set pin output type to open-drain
 	GPIOB->OTYPER |= GPIO_OTYPER_OPEN_DRAIN << I2C2_SCL_POS;
 	GPIOB->OTYPER |= GPIO_OTYPER_OPEN_DRAIN << I2C2_SDA_POS;
 	// Enable internal pull-up register
-	GPIOB->PUPDR |= GPIO_PUPDR_PULL_UP << (2 * I2C2_SCL_POS);
-	GPIOB->PUPDR |= GPIO_PUPDR_PULL_UP << (2 * I2C2_SDA_POS);
+	GPIOB->PUPDR |= GPIO_PUPDR_PULL_UP << (I2C2_SCL_POS << 1);
+	GPIOB->PUPDR |= GPIO_PUPDR_PULL_UP << (I2C2_SDA_POS << 1);
 
 	/*        Configure I2C parameters        */
 
