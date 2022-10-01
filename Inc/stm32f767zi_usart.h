@@ -60,7 +60,8 @@
 void usart2_default_init(void);
 void usart3_default_init(void);
 void usart3_interrupt_default_init(void);
-void usart_write(USART_reg_t *USARTx,uint8_t value);
+void usart_write(USART_reg_t *USARTx, uint8_t value);
 uint8_t usart_read(USART_reg_t *USARTx);
+void usart_w_arr(USART_reg_t *USARTx, uint8_t *arr, const uint8_t size);
 
 #endif

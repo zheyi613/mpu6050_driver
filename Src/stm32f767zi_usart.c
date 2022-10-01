@@ -48,7 +48,7 @@ void usart3_default_init(void)
 	// Configure USART parameters (TE, RE, PS, PCE, M, STOP)
 	USART3->CR1 |= (1U << USART_CR1_TE_POS) | (1U << USART_CR1_RE_POS);
 	// Set baud rate
-	USART3->BRR = (PERIPH_CLK + (921600 / 2U)) / 921600;
+	USART3->BRR = (PERIPH_CLK + (460800 / 2U)) / 460800;
 	// enable USART3
 	USART3->CR1 |= 1U << USART_CR1_UE_POS;
 }
@@ -105,4 +105,10 @@ int __io_putchar(int ch)
 int __io_getchar(void)
 {
 	return usart_read(USART3);
+}
+
+void usart_w_arr(USART_reg_t *USARTx, uint8_t *arr, const uint8_t size)
+{
+	for (uint8_t i = 0 ; i < size; i++)
+		usart_write(USARTx, *(arr++));
 }
