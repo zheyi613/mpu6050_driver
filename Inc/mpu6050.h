@@ -149,15 +149,21 @@
 #define MPU6050_GYRO_UNIT               0.007629510948F // minimum unit (+-250dps)
 #define MPU6050_ACCEL_UNIT              0.000061036087F // minimum unit (+-2g)
 
+typedef struct {
+        float accel[3];
+        float temp;
+        float ang_vel[3];
+} data_t;
+
 void mpu6050_power_on(void);
 void mpu6050_selftest(float *err);
 void mpu6050_default_init(void);
 void mpu6050_init(uint16_t sample_rate, uint8_t acce_range, uint16_t gyro_range);
-void mpu6050_kalman(float (*X)[2], float *angle, float *rate, float dt);
+void mpu6050_kalman(float (*X)[2], float *angle, float *ang_vel, float dt);
 void mpu6050_static_attitude(float *accel, float *euler);
-void mpu6050_get_all(float *data);
+void mpu6050_get_all(data_t *data);
+void mpu6050_get_accel(float *accel);
 float mpu6050_get_temperature(void);
-void mpu6050_get_gyro(float *data);
-void mpu6050_get_accel(float *data);
+void mpu6050_get_gyro(float *ang_vel);
 
 #endif

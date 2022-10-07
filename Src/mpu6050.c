@@ -200,13 +200,13 @@ static void calibration(uint16_t sample_rate)
 	accel_unit *= 16384.0 / sqrtf(sum_squares);
 }
 
-void mpu6050_kalman(float (*X)[2], float *angle, float *rate, float dt)
+void mpu6050_kalman(float (*X)[2], float *angle, float *ang_vel, float dt)
 {
 	static float P[2][2][2] = {0}, Q = 0.08, R = 0.5;
 	float X_[2] = {0}, P_[2][2] = {0}, K[2] = {0};
 
 	for (int i = 0; i < 2; i++) {
-		X_[0] = X[i][0] + dt * (rate[i] - X[i][1]);
+		X_[0] = X[i][0] + dt * (ang_vel[i] - X[i][1]);
 		X_[1] = X[i][1];
 
 		P_[0][0] =
@@ -228,10 +228,10 @@ void mpu6050_kalman(float (*X)[2], float *angle, float *rate, float dt)
 		P[i][1][1] = P_[1][1] - K[1] * P_[0][1];
 	}
 	// Yaw can't use filter to decrease noise, so use threshold to eliminate
-	if (rate[2] < 0.08 && rate[2] > -0.08)
-		rate[2] = 0;
-	X[2][0] += dt * rate[2];
-	X[2][1] = rate[2];
+	if (ang_vel[2] < 0.08 && ang_vel[2] > -0.08)
+		ang_vel[2] = 0;
+	X[2][0] += dt * ang_vel[2];
+	X[2][1] = ang_vel[2];
 }
 
 /**
@@ -258,7 +258,7 @@ void mpu6050_static_attitude(float *accel, float *euler)
  * 	  temperature: [3]
  * 	  gyroscope: [4:6]
  */
-void mpu6050_get_all(float *data)
+void mpu6050_get_all(data_t *data)
 {
 	int16_t tmp[7] = {0};
 
@@ -269,18 +269,17 @@ void mpu6050_get_all(float *data)
 		tmp[i] = (tmp[i] << 8) | ((tmp[i] >> 8) & 0xFF);
 
 		if (i < 3) {
-			// tmp[i] -= gyro_bias[i];
-			data[i] = (float)tmp[i] * accel_unit;
+			((float *)data)[i] = (float)tmp[i] * accel_unit;
 		} else if (i == 3) {
-			data[i] = (float)tmp[i] * 0.00294117647 + 36.53;
+			((float *)data)[i] = (float)tmp[i] * 0.00294117647 + 36.53;
 		} else {
 			tmp[i] -= gyro_bias[i - 4];
-			data[i] = (float)tmp[i] * gyro_unit;
+			((float *)data)[i] = (float)tmp[i] * gyro_unit;
 		}
 	}
 }
 
-void mpu6050_get_accel(float *data)
+void mpu6050_get_accel(float *accel)
 {
 	int16_t tmp[3] = {0};
 
@@ -289,7 +288,7 @@ void mpu6050_get_accel(float *data)
 
 	for (int i = 0; i < 3; i++) {
 		tmp[i] = (tmp[i] << 8) | ((tmp[i] >> 8) & 0xFF);
-		data[i] = (float)tmp[i] * accel_unit;
+		accel[i] = (float)tmp[i] * accel_unit;
 	}
 }
 
@@ -307,7 +306,7 @@ float mpu6050_get_temperature(void)
 	return (float)tmp * 0.00294117647 + 36.53;
 }
 
-void mpu6050_get_gyro(float *data)
+void mpu6050_get_gyro(float *ang_vel)
 {
 	int16_t tmp[3] = {0};
 
@@ -317,6 +316,6 @@ void mpu6050_get_gyro(float *data)
 	for (int i = 0; i < 3; i++) {
 		tmp[i] = (tmp[i] << 8) | ((tmp[i] >> 8) & 0xFF);
 		tmp[i] -= gyro_bias[i];
-		data[i] = (float)tmp[i] * gyro_unit;
+		ang_vel[i] = (float)tmp[i] * gyro_unit;
 	}
 }

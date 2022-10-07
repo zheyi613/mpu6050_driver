@@ -15,12 +15,12 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-float get[7] = {0};
+data_t get[7] = {0};
 float state[3][2] = {0};
 float angle[3] = {0};
 float dt = 0;
 uint8_t buff[80];
-uint8_t tr_size = 0;
+uint8_t tx_size = 0;
 
 int main(void)
 {
@@ -62,34 +62,34 @@ void TIM1_UP_TIM10_IRQHandler(void)
 		/* Clear the update interrupt flag */
 		TIM1->SR &= ~TIM_SR_UIF;
 		/* Get mpu6050 data */
-		mpu6050_get_all(get);			   /* 500 us */
-		mpu6050_static_attitude(get, angle);	   /* 56 us */
-		mpu6050_kalman(state, angle, &get[4], dt); /* 106 us */
+		mpu6050_get_all(get);				/* 500 us */
+		mpu6050_static_attitude(get->accel, angle);		/* 56 us */
+		mpu6050_kalman(state, angle, get->ang_vel, dt); /* 106 us */
 		/* 1500 us */
-		tr_size = snprintf((char *)buff, sizeof(buff),
-				   "%.3f,%.3f,%.3f,%.2f,%.2f,%.2f\n", get[0],
-				   get[1], get[2], state[0][0], state[1][0],
-				   state[2][0]);
+		tx_size = snprintf((char *)buff, sizeof(buff),
+				   "%.3f,%.3f,%.3f,%.2f,%.2f,%.2f\n",
+				   get->accel[0], get->accel[1], get->accel[2],
+				   state[0][0], state[1][0], state[2][0]);
 		/* 615 us */
-		// tr_size = 0;
+		// tx_size = 0;
 		// uint8_t *tmp;
 		// int i = 0, j = 0;
 		// for (i = 0; i < 3; i++) {
 		// 	tmp = (uint8_t *)&get[i];
 		// 	for (j = 0; j < 4; j++)
-		// 		buff[tr_size++] = tmp[j];
-		// 	buff[tr_size++] = (uint8_t)',';
+		// 		buff[tx_size++] = tmp[j];
+		// 	buff[tx_size++] = (uint8_t)',';
 		// }
 		// for (i = 0; i < 2; i++) {
 		// 	tmp = (uint8_t *)&state[i][0];
 		// 	for (j = 0; j < 4; j++)
-		// 		buff[tr_size++] = tmp[j];
-		// 	buff[tr_size++] = (uint8_t)',';
+		// 		buff[tx_size++] = tmp[j];
+		// 	buff[tx_size++] = (uint8_t)',';
 		// }
 		// tmp = (uint8_t *)&state[2][0];
 		// for (j = 0; j < 4; j++)
-		// 	buff[tr_size++] = tmp[j];
-		// buff[tr_size++] = (uint8_t)'\n';
-		usart_w_arr(USART3, buff, tr_size);
+		// 	buff[tx_size++] = tmp[j];
+		// buff[tx_size++] = (uint8_t)'\n';
+		usart_w_arr(USART3, buff, tx_size);
 	}
 }
