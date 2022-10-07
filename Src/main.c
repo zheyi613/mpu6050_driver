@@ -63,7 +63,7 @@ void TIM1_UP_TIM10_IRQHandler(void)
 		TIM1->SR &= ~TIM_SR_UIF;
 		/* Get mpu6050 data */
 		mpu6050_get_all(get);				/* 500 us */
-		mpu6050_static_attitude(get->accel, angle);		/* 56 us */
+		mpu6050_static_attitude(get->accel, angle);	/* 56 us */
 		mpu6050_kalman(state, angle, get->ang_vel, dt); /* 106 us */
 		/* 1500 us */
 		tx_size = snprintf((char *)buff, sizeof(buff),

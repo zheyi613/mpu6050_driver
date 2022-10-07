@@ -31,8 +31,8 @@ void usart2_default_init(void)
 // transmit enable: enable
 // parity: none
 // stop bits: 1
-// baud rate: 115200
-void usart3_default_init(void)
+// baud rate: 460800
+void usart3_deinit(void)
 {
 	// Enable clock access to GPIOD.
 	RCC->AHB1ENR |= GPIOD_CLK_EN;
@@ -53,7 +53,7 @@ void usart3_default_init(void)
 	USART3->CR1 |= 1U << USART_CR1_UE_POS;
 }
 
-void usart3_interrupt_default_init(void)
+void usart3_int_deinit(void)
 {
 	// Enable clock access to GPIOD.
 	RCC->AHB1ENR |= GPIOD_CLK_EN;
@@ -80,7 +80,7 @@ void usart3_interrupt_default_init(void)
 		(uint32_t)(1UL << (((uint32_t)USART3_IRQn) & 0x1FUL));
 }
 
-void usart_write(USART_reg_t *USARTx, uint8_t value)
+void usart_tx(USART_reg_t *USARTx, uint8_t value)
 {
 	// Make sure transmit data register is empty
 	while (!(USARTx->ISR & USART_ISR_TXE))
@@ -89,7 +89,7 @@ void usart_write(USART_reg_t *USARTx, uint8_t value)
 	USARTx->TDR = value;
 }
 
-uint8_t usart_read(USART_reg_t *USARTx)
+uint8_t usart_rx(USART_reg_t *USARTx)
 {
 	while (!(USARTx->ISR & USART_ISR_RXNE))
 		;
@@ -98,17 +98,17 @@ uint8_t usart_read(USART_reg_t *USARTx)
 
 int __io_putchar(int ch)
 {
-	usart_write(USART3, ch);
+	usart_tx(USART3, ch);
 	return ch;
 }
 
 int __io_getchar(void)
 {
-	return usart_read(USART3);
+	return usart_rx(USART3);
 }
 
-void usart_w_arr(USART_reg_t *USARTx, uint8_t *arr, const uint8_t size)
+void usart_tx_arr(USART_reg_t *USARTx, uint8_t *arr, const uint8_t size)
 {
 	for (uint8_t i = 0 ; i < size; i++)
-		usart_write(USARTx, *(arr++));
+		usart_tx(USARTx, *(arr++));
 }

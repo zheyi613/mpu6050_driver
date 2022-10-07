@@ -57,11 +57,11 @@
 
 #define USART3_IRQn             39U
 
-void usart2_default_init(void);
-void usart3_default_init(void);
-void usart3_interrupt_default_init(void);
-void usart_write(USART_reg_t *USARTx, uint8_t value);
-uint8_t usart_read(USART_reg_t *USARTx);
-void usart_w_arr(USART_reg_t *USARTx, uint8_t *arr, const uint8_t size);
+void usart2_deinit(void);
+void usart3_deinit(void);
+void usart3_int_deinit(void);
+void usart_tx(USART_reg_t *USARTx, uint8_t value);
+uint8_t usart_rx(USART_reg_t *USARTx);
+void usart_tx_arr(USART_reg_t *USARTx, uint8_t *arr, const uint8_t size);
 
 #endif
