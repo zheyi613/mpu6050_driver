@@ -158,7 +158,7 @@ typedef struct {
 void mpu6050_power_on(void);
 void mpu6050_selftest(float *err);
 void mpu6050_default_init(void);
-void mpu6050_init(uint16_t sample_rate, uint8_t acce_range, uint16_t gyro_range);
+void mpu6050_init(const uint16_t sample_rate, uint8_t acce_range, uint16_t gyro_range);
 void mpu6050_kalman(float (*X)[2], float *angle, float *ang_vel, float dt);
 void mpu6050_static_attitude(float *accel, float *euler);
 void mpu6050_get_all(data_t *data);

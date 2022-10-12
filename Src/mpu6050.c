@@ -96,9 +96,9 @@ void mpu6050_default_init(void)
 	tmp = MPU6050_CLK_X_GYRO;
 	i2c_write_reg(I2C1, MPU6050_ADDRESS, MPU6050_PWR_MGMT_1, 1, &tmp);
 	systick_delay_ms(100);
-	// Set sample rate to 1kHz
-	tmp = 1;
-	i2c_write_reg(I2C1, MPU6050_ADDRESS, MPU6050_CONFIG, 1, &tmp);
+	// Set sample rate to 1kHz (8kHz / 8)
+	tmp = 8;
+	i2c_write_reg(I2C1, MPU6050_ADDRESS, MPU6050_SMPLRT_DIV, 1, &tmp);
 	// initial gyroscope and accelorometer unit
 	gyro_unit = MPU6050_GYRO_UNIT;
 	accel_unit = MPU6050_ACCEL_UNIT;
@@ -113,18 +113,25 @@ void mpu6050_default_init(void)
  * @param gyro_range  (dps)
  * @param accel_range (g)
  */
-void mpu6050_init(uint16_t sample_rate, uint8_t accel_range,
+void mpu6050_init(const uint16_t sample_rate, uint8_t accel_range,
 		  uint16_t gyro_range)
 {
-	uint8_t div = (uint8_t)(1000 / sample_rate - 1);
+	uint8_t div = 0;
 	uint8_t low_pass_cfg = 0;
 	uint16_t tmp = sample_rate;
 
 	mpu6050_default_init();
 
+	if (sample_rate < 200)
+		div = (uint8_t)(1000 / sample_rate - 1);
+	else if (sample_rate < 1000)
+		div = (uint8_t)(8000 / sample_rate - 1);
+	else
+		div = 8; /* Max freq = 1kHz */
+
 	i2c_write_reg(I2C1, MPU6050_ADDRESS, MPU6050_SMPLRT_DIV, 1, &div);
-	// Set low pass filter
-	while (1000 > tmp) {
+	// Set low pass filter if sample rate < 200Hz
+	while (tmp <= 200) {
 		tmp <<= 1;
 		low_pass_cfg++;
 	}
@@ -154,50 +161,6 @@ void mpu6050_init(uint16_t sample_rate, uint8_t accel_range,
 	systick_delay_ms(500);
 
 	calibration(sample_rate);
-}
-
-static void calibration(uint16_t sample_rate)
-{
-	uint8_t tmp = MPU6050_USER_CTRL_FIFO_EN;
-	uint16_t fifo_count = 0;
-	uint16_t packet_count = 0;
-	int16_t data[6] = {0};
-	int32_t sum[6] = {0};
-	float sum_squares = 0;
-
-	// Enable FIFO
-	i2c_write_reg(I2C1, MPU6050_ADDRESS, MPU6050_USER_CTRL, 1, &tmp);
-	// Enable gyro and accel FIFO
-	tmp = 0x78;
-	i2c_write_reg(I2C1, MPU6050_ADDRESS, MPU6050_FIFO_EN, 1, &tmp);
-	// According to sample division to delay time
-	systick_delay_ms(10000 / (int)sample_rate);
-	// Disable accel and gyro FIFO
-	tmp = 0;
-	i2c_write_reg(I2C1, MPU6050_ADDRESS, MPU6050_FIFO_EN, 1, &tmp);
-	// Read FIFO sample count
-	i2c_read_reg(I2C1, MPU6050_ADDRESS, MPU6050_FIFO_COUNTH, 2,
-		     (uint8_t *)&fifo_count);
-	fifo_count = (fifo_count << 8) | (fifo_count >> 8);
-	packet_count = fifo_count / 12;
-	// Read FIFO data and calculate gain/bias
-	for (int i = 0; i < packet_count; i++) {
-		i2c_read_reg(I2C1, MPU6050_ADDRESS, MPU6050_FIFO_R_W, 12,
-			     (uint8_t *)data);
-
-		for (int j = 0; j < 6; j++) {
-			data[j] = (data[j] << 8) | ((data[j] >> 8) & 0xFF);
-			sum[j] += (int32_t)data[j];
-		}
-	}
-
-	for (int i = 0; i < 3; i++) {
-		sum[i] /= packet_count;
-		sum_squares += (float)sum[i] * (float)sum[i];
-		gyro_bias[i] = (int16_t)(sum[i + 3] / packet_count);
-	}
-	// Change accel unit by accel gain
-	accel_unit *= 16384.0 / sqrtf(sum_squares);
 }
 
 void mpu6050_kalman(float (*X)[2], float *angle, float *ang_vel, float dt)
